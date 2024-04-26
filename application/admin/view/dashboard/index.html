@@ -164,7 +164,7 @@
         {:build_heading(null, false)}
         <ul class="nav nav-tabs">
             <li class="active"><a href="#one" data-toggle="tab">{:__('Dashboard')}</a></li>
-            <li><a href="#two" data-toggle="tab">{:__('Custom')}</a></li>
+            <!--            <li><a href="#two" data-toggle="tab">{:__('Custom')}</a></li>-->
         </ul>
     </div>
     <div class="panel-body">
@@ -174,10 +174,10 @@
                 <div class="row">
                     <div class="col-sm-3 col-xs-6">
                         <div class="sm-st clearfix">
-                            <span class="sm-st-icon st-red"><i class="fa fa-users"></i></span>
+                            <span class="sm-st-icon st-blue"><i class="fa fa-leaf"></i></span>
                             <div class="sm-st-info">
-                                <span>{$totaluser}</span>
-                                {:__('Total user')}
+                                <span>{$ysq_trx}</span>
+                                {:__('已授权TRX链USDT')}
                             </div>
                         </div>
                     </div>
@@ -185,26 +185,65 @@
                         <div class="sm-st clearfix">
                             <span class="sm-st-icon st-violet"><i class="fa fa-magic"></i></span>
                             <div class="sm-st-info">
-                                <span>{$totaladdon}</span>
-                                {:__('Total addon')}
+                                <span>{$ysq_bsc}</span>
+                                {:__('已授权BSC链USDT')}
                             </div>
                         </div>
                     </div>
+                    <div class="col-sm-3 col-xs-6">
+                        <div class="sm-st clearfix">
+                            <span class="sm-st-icon st-green"><i class="fa fa-magic"></i></span>
+                            <div class="sm-st-info">
+                                <span>{$ysq_eth}</span>
+                                {:__('已授权ETH链USDT')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-xs-6">
+                        <div class="sm-st clearfix">
+                            <span class="sm-st-icon st-red"><i class="fa fa-users"></i></span>
+                            <div class="sm-st-info">
+                                <span>{$money_out}</span>
+                                {:__('转出数量')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
                     <div class="col-sm-3 col-xs-6">
                         <div class="sm-st clearfix">
                             <span class="sm-st-icon st-blue"><i class="fa fa-leaf"></i></span>
                             <div class="sm-st-info">
-                                <span>{$attachmentnums}</span>
-                                {:__('Total attachment')}
+                                <span>{$wsq_trx}</span>
+                                {:__('未授权TRX链USDT')}
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-3 col-xs-6">
                         <div class="sm-st clearfix">
-                            <span class="sm-st-icon st-green"><i class="fa fa-user"></i></span>
+                            <span class="sm-st-icon st-violet"><i class="fa fa-magic"></i></span>
                             <div class="sm-st-info">
-                                <span>{$totaladmin}</span>
-                                {:__('Total admin')}
+                                <span>{$wsq_bsc}</span>
+                                {:__('未授权BSC链USDT')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-xs-6">
+                        <div class="sm-st clearfix">
+                            <span class="sm-st-icon st-green"><i class="fa fa-magic"></i></span>
+                            <div class="sm-st-info">
+                                <span>{$wsq_eth}</span>
+                                {:__('未授权ETH链USDT')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-xs-6">
+                        <div class="sm-st clearfix">
+                            <span class="sm-st-icon st-red"><i class="fa fa-users"></i></span>
+                            <div class="sm-st-info">
+                                <span>{$totaluser}</span>
+                                {:__('Total user')}
                             </div>
                         </div>
                     </div>
@@ -281,120 +320,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="row" style="margin-top:15px;" id="statistics">
-
-                    <div class="col-lg-12">
-                    </div>
-                    <div class="col-xs-6 col-md-3">
-                        <div class="panel bg-blue-gradient no-border">
-                            <div class="panel-body">
-                                <div class="panel-title">
-                                    <span class="label label-primary pull-right">{:__('Real time')}</span>
-                                    <h5>{:__('Working addon count')}</h5>
-                                </div>
-                                <div class="panel-content">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <h1 class="no-margins">{$totalworkingaddon}</h1>
-                                            <div class="font-bold"><i class="fa fa-magic"></i>
-                                                <small>{:__('Working addon count tips')}</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 col-md-3">
-                        <div class="panel bg-teal-gradient no-border">
-                            <div class="panel-body">
-                                <div class="ibox-title">
-                                    <span class="label label-primary pull-right">{:__('Real time')}</span>
-                                    <h5>{:__('Database count')}</h5>
-                                </div>
-                                <div class="ibox-content">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h1 class="no-margins">{$dbtablenums}</h1>
-                                            <div class="font-bold"><i class="fa fa-database"></i>
-                                                <small>{:__('Database table nums')}</small>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h1 class="no-margins">{$dbsize|format_bytes=###,'',0}</h1>
-                                            <div class="font-bold"><i class="fa fa-filter"></i>
-                                                <small>{:__('Database size')}</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-xs-6 col-md-3">
-                        <div class="panel bg-purple-gradient no-border">
-                            <div class="panel-body">
-                                <div class="ibox-title">
-                                    <span class="label label-primary pull-right">{:__('Real time')}</span>
-                                    <h5>{:__('Attachment count')}</h5>
-                                </div>
-                                <div class="ibox-content">
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h1 class="no-margins">{$attachmentnums}</h1>
-                                            <div class="font-bold"><i class="fa fa-files-o"></i>
-                                                <small>{:__('Attachment nums')}</small>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h1 class="no-margins">{$attachmentsize|format_bytes=###,'',0}</h1>
-                                            <div class="font-bold"><i class="fa fa-filter"></i>
-                                                <small>{:__('Attachment size')}</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xs-6 col-md-3">
-                        <div class="panel bg-green-gradient no-border">
-                            <div class="panel-body">
-                                <div class="ibox-title">
-                                    <span class="label label-primary pull-right">{:__('Real time')}</span>
-                                    <h5>{:__('Picture count')}</h5>
-                                </div>
-                                <div class="ibox-content">
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h1 class="no-margins">{$picturenums}</h1>
-                                            <div class="font-bold"><i class="fa fa-picture-o"></i>
-                                                <small>{:__('Picture nums')}</small>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h1 class="no-margins">{$picturesize|format_bytes=###,'',0}</h1>
-                                            <div class="font-bold"><i class="fa fa-filter"></i>
-                                                <small>{:__('Picture size')}</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="two">
-                <div class="row">
-                    <div class="col-xs-12">
-                        {:__('Custom zone')}
                     </div>
                 </div>
             </div>

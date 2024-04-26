@@ -173,8 +173,12 @@ define(['jquery', 'bootstrap', 'dropzone', 'template'], function ($, undefined, 
                         options = $.extend(true, {}, options, $(this).data("upload-options") || {});
                         delete options.success;
                         delete options.url;
-                        // delete options.params;
                         multipart = $.isArray(multipart) ? {} : multipart;
+                        var params = $(this).data("params") || {};
+                        var category = typeof params.category !== 'undefined' ? params.category : ($(this).data("category") || '');
+                        if (category) {
+                            // multipart.category = category;
+                        }
 
                         Upload.list[id] = new Dropzone(this, $.extend({
                             url: url,

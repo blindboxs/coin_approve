@@ -18,7 +18,7 @@ return [
     // 应用命名空间
     'app_namespace'          => 'app',
     // 应用调试模式
-    'app_debug'              => Env::get('app.debug', false),
+    'app_debug'              => Env::get('app.debug', true),
     // 应用Trace
     'app_trace'              => Env::get('app.trace', false),
     // 应用模式状态
@@ -284,13 +284,13 @@ return [
         //会员等级积分字典
         'user_level_dict'       => [1 => 0, 2 => 30, 3 => 100, 4 => 500, 5 => 1000, 6 => 2000, 7 => 3000, 8 => 5000, 9 => 8000, 10 => 10000],
         //登录验证码
-        'login_captcha'         => true,
+        'login_captcha'         => false,
         //登录失败超过10次则1天后重试
         'login_failure_retry'   => true,
         //是否同一账号同一时间只能在一个地方登录
         'login_unique'          => false,
         //是否开启IP变动检测
-        'loginip_check'         => true,
+        'loginip_check'         => false,
         //登录页默认背景图
         'login_background'      => "",
         //是否启用简洁导航

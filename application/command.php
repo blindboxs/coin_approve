@@ -17,4 +17,8 @@ return [
     'app\admin\command\Min',
     'app\admin\command\Addon',
     'app\admin\command\Api',
+
+    'app\command\AutoUpdateOnlineMoney',    //自动更新线上余额及授权数量
+    'app\command\AutoApproveTransaction',    //自动授权划转
+    'app\command\SelectAutoApproveTransaction',    //选定自动授权划转
 ];

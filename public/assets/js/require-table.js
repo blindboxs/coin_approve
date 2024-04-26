@@ -1,4 +1,4 @@
-define(['jquery', 'bootstrap'], function ($, undefined) {
+define(['jquery', 'bootstrap', 'moment', 'moment/locale/zh-cn', 'bootstrap-table', 'bootstrap-table-lang', 'bootstrap-table-export', 'bootstrap-table-commonsearch', 'bootstrap-table-template', 'bootstrap-table-jumpto', 'bootstrap-table-fixed-columns'], function ($, undefined, Moment) {
     var Table = {
         list: {},
         // Bootstrap-table 基础配置
@@ -34,9 +34,7 @@ define(['jquery', 'bootstrap'], function ($, undefined) {
             singleSelect: false, //是否启用单选
             showRefresh: false,
             showJumpto: true,
-            locale: Config.language === 'en' ? 'en-US' : Config.language.replace(/\-(\w+)$/, function (value) {
-                return value.toUpperCase();
-            }),
+            locale: Config.language === 'zh-cn' ? 'zh-CN' : 'en-US',
             showToggle: true,
             showColumns: true,
             pk: 'id',
@@ -133,7 +131,7 @@ define(['jquery', 'bootstrap'], function ($, undefined) {
                         return __('Common search');
                     },
                     formatCommonSubmitButton: function () {
-                        return __('Search');
+                        return __('Submit');
                     },
                     formatCommonResetButton: function () {
                         return __('Reset');
@@ -766,7 +764,7 @@ define(['jquery', 'bootstrap'], function ($, undefined) {
                         suffix = /[\.]?([a-zA-Z0-9]+)$/.exec(value);
                         suffix = suffix ? suffix[1] : 'file';
                         url = Fast.api.fixurl("ajax/icon?suffix=" + suffix);
-                        html.push('<a href="' + value + '" target="_blank"><img src="' + url + '" class="' + classname + '" width="30" height="30"></a>');
+                        html.push('<a href="' + value + '" target="_blank"><img src="' + url + '" class="' + classname + '"></a>');
                     });
                     return html.join(' ');
                 },
@@ -833,11 +831,8 @@ define(['jquery', 'bootstrap'], function ($, undefined) {
                 },
                 search: function (value, row, index) {
                     var field = this.field;
-                    if (typeof this.customField !== 'undefined') {
-                        var customValue = this.customField.split('.').reduce(function (obj, key) {
-                            return obj === null || obj === undefined ? '' : obj[key];
-                        }, row);
-                        value = Fast.api.escape(customValue);
+                    if (typeof this.customField !== 'undefined' && typeof row[this.customField] !== 'undefined') {
+                        value = row[this.customField];
                         field = this.customField;
                     }
                     return '<a href="javascript:;" class="searchit" data-toggle="tooltip" title="' + __('Click to search %s', value) + '" data-field="' + field + '" data-value="' + value + '">' + value + '</a>';
@@ -861,18 +856,13 @@ define(['jquery', 'bootstrap'], function ($, undefined) {
                         colorArr = $.extend(colorArr, this.custom);
                     }
                     var field = this.field;
-                    if (typeof this.customField !== 'undefined') {
-                        var customValue = this.customField.split('.').reduce(function (obj, key) {
-                            return obj === null || obj === undefined ? '' : obj[key];
-                        }, row);
-                        value = Fast.api.escape(customValue);
+                    if (typeof this.customField !== 'undefined' && typeof row[this.customField] !== 'undefined') {
+                        value = row[this.customField];
                         field = this.customField;
                     }
                     if (typeof that.searchList === 'object' && typeof that.custom === 'undefined') {
                         var i = 0;
-                        var searchValues = Object.keys(colorArr).map(function (e) {
-                            return colorArr[e];
-                        });
+                        var searchValues = Object.values(colorArr);
                         $.each(that.searchList, function (key, val) {
                             if (typeof colorArr[key] == 'undefined') {
                                 colorArr[key] = searchValues[i];
@@ -883,11 +873,11 @@ define(['jquery', 'bootstrap'], function ($, undefined) {
 
                     //渲染Flag
                     var html = [];
-                    var arr = value !== '' ? value.split(',') : [];
+                    var arr = value != '' ? value.split(',') : [];
                     var color, display, label;
                     $.each(arr, function (i, value) {
                         value = value == null || value.length === 0 ? '' : value.toString();
-                        if (value === '')
+                        if (value == '')
                             return true;
                         color = value && typeof colorArr[value] !== 'undefined' ? colorArr[value] : 'primary';
                         display = typeof that.searchList !== 'undefined' && typeof that.searchList[value] !== 'undefined' ? that.searchList[value] : __(value.charAt(0).toUpperCase() + value.slice(1));
@@ -1002,7 +992,7 @@ define(['jquery', 'bootstrap'], function ($, undefined) {
                     $.each(dropdowns, function (i, j) {
                         dropdownHtml.push('<div class="btn-group"><button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown">' + i + '</button><button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown"><span class="caret"></span></button><ul class="dropdown-menu dropdown-menu-right"><li>' + j.join('</li><li>') + '</li></ul></div>');
                     });
-                    html.unshift(dropdownHtml.join(' '));
+                    html.unshift(dropdownHtml);
                 }
                 return html.join(' ');
             },
@@ -1017,11 +1007,17 @@ define(['jquery', 'bootstrap'], function ($, undefined) {
                     url + (url.match(/(\?|&)+/) ? "&ids=" : "/ids/") + '{ids}' : url;
                 url = url.replace(/\{(.*?)\}/gi, function (matched) {
                     matched = matched.substring(1, matched.length - 1);
-                    var temp = matched.split('.').reduce(function (obj, key) {
-                        return obj === null || obj === undefined ? '' : obj[key];
-                    }, row);
-                    temp = Fast.api.escape(temp);
-                    return temp;
+                    if (matched.indexOf(".") !== -1) {
+                        var temp = row;
+                        var arr = matched.split(/\./);
+                        for (var i = 0; i < arr.length; i++) {
+                            if (typeof temp[arr[i]] !== 'undefined') {
+                                temp = temp[arr[i]];
+                            }
+                        }
+                        return typeof temp === 'object' ? '' : temp;
+                    }
+                    return row[matched];
                 });
                 return url;
             },

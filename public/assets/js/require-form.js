@@ -102,7 +102,6 @@ define(['jquery', 'bootstrap', 'upload', 'validator', 'validator-lang'], functio
                 //绑定select元素事件
                 if ($(".selectpicker", form).length > 0) {
                     require(['bootstrap-select', 'bootstrap-select-lang'], function () {
-                        $.fn.selectpicker.Constructor.BootstrapVersion = '3';
                         $('.selectpicker', form).selectpicker();
                         $(form).on("reset", function () {
                             setTimeout(function () {
@@ -219,7 +218,7 @@ define(['jquery', 'bootstrap', 'upload', 'validator', 'validator-lang'], functio
                         };
                         var origincallback = function (start, end) {
                             $(this.element).val(start.format(this.locale.format) + " - " + end.format(this.locale.format));
-                            $(this.element).trigger('change').trigger('validate');
+                            $(this.element).trigger('change');
                         };
                         $(".datetimerange", form).each(function () {
                             var callback = typeof $(this).data('callback') == 'function' ? $(this).data('callback') : origincallback;
@@ -227,7 +226,7 @@ define(['jquery', 'bootstrap', 'upload', 'validator', 'validator-lang'], functio
                                 callback.call(picker, picker.startDate, picker.endDate);
                             });
                             $(this).on('cancel.daterangepicker', function (ev, picker) {
-                                $(this).val('').trigger('change').trigger('validate');
+                                $(this).val('').trigger('change');
                             });
                             $(this).daterangepicker($.extend(true, {}, options, $(this).data() || {}, $(this).data("daterangepicker-options") || {}));
                         });
