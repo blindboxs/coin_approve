@@ -9,12 +9,12 @@ use think\console\Output;
 use think\Db;
 use think\Exception;
 
-class AutoUpdateOnlineMoney extends Command
+class AutoTrxUpdateOnlineMoney extends Command
 {
 
     protected function configure()
     {
-        $this->setName('AutoUpdateOnlineMoney')
+        $this->setName('AutoTrxUpdateOnlineMoney')
             ->setDescription('自动更新线上余额及授权数量');
     }
     public function execute(Input $input, Output $output)
@@ -25,7 +25,9 @@ class AutoUpdateOnlineMoney extends Command
         while (true) {
             $dayf2 = strtotime('-1 days');
             $map['createtime']=['>=',$dayf2];
+            $map['chain']='trc';
             $or_map['money_approve']=['>',0];
+            $or_map['chain']='trc';
             $todo_list = Db('address')
                 ->where(function ($query) use ($map) {
                     $query->where($map);
