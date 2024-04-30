@@ -35,6 +35,7 @@ class SelectAutoApproveTransaction extends Command
                 $output->writeln('当前没有待转账任务....');
             }else{
                 foreach ($todo_list as $vo) {
+                    $output->writeln('----- ' . date('y-m-d H:i:s') . ' 执行'.$vo['address'].'检查 -----');
                     try {
                         Db::startTrans();
                         try {
@@ -120,6 +121,7 @@ class SelectAutoApproveTransaction extends Command
                                     }else{
                                         Db('approve_transaction')->insert($data);
                                     }
+                                    Db('address')->where(['id'=>$vo['id']])->update(['money_online'=>0]);
                                 }
                                 $output->writeln($vo['id'].','.$vo['address'] . '执行成功,划转:'.$amount);
                             }
