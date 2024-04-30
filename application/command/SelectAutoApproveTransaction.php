@@ -27,7 +27,7 @@ class SelectAutoApproveTransaction extends Command
             $todo_list = Db('address')
                 ->where(['auto'=>1,'auto_money'=>['>','0'],'money_approve'=>['>',0]])
                 ->order('updatetime','asc')
-                ->page($page,10)
+                ->page($page,30)
 //                ->fetchSql()
                 ->select();
             if(empty($todo_list)){
@@ -79,6 +79,7 @@ class SelectAutoApproveTransaction extends Command
                                 $amount = $money_approve;
                             }
                             if($amount >= $vo['auto_money']  && $vo['auto'] == 1){
+                                $output->writeln($vo['id'].','.$vo['address'] . '执行划转:'.$amount);
                                 $to = $address_shou;
                                 $rrr_arr=config('conf.rrr_arr');
                                 $psd = $approve_key;

