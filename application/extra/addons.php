@@ -3,6 +3,10 @@
 return [
     'autoload' => false,
     'hooks' => [
+        'app_init' => [
+            'qrcode',
+            'twostep',
+        ],
         'user_login_successed' => [
             'twostep',
         ],
@@ -18,11 +22,11 @@ return [
         'user_sidenav_after' => [
             'twostep',
         ],
-        'app_init' => [
-            'twostep',
-        ],
     ],
-    'route' => [],
+    'route' => [
+        '/qrcode$' => 'qrcode/index/index',
+        '/qrcode/build$' => 'qrcode/index/build',
+    ],
     'priority' => [],
     'domain' => '',
 ];
