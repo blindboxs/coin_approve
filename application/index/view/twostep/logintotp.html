@@ -1,0 +1,33 @@
+<div id="content-container" class="container">
+    <div class="user-section login-section">
+        <div class="logon-tab clearfix"></div>
+        <div class="login-main">
+            <h1>
+                <span>动态口令</span>
+                {if $other}
+                <button class='btn btn-info pull-right'><a class="btn btn-info pull-right" href="{:url('twostep/loginwebauthn')}" role="button">切换为 安全密钥</a></button>
+                {/if}
+            </h1>
+            <form name="form" id="login-form" class="form-vertical" method="POST" action="{:url('twostep/logincheck')}">
+                {:token()}
+                <div class="form-group">
+                    <label class="control-label" for="twostep_code"></label>
+                    <div class="alert alert-info-light">
+                        {:__('Please input Code')}</a>
+                    </div>
+                    <div class="controls">
+                        <input class="form-control input-lg" type="number" name="twostep_code" data-rule="required;" placeholder="{:__('Please input Code')}" autocomplete="off" id="totp">
+                        <input type="hidden" name="type" value="totp"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">{:__('Verify now')}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    var otxt = document.getElementById("totp");
+    otxt.focus();
+</script>

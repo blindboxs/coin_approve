@@ -1,0 +1,55 @@
+<script src="__CDN__/assets/addons/twostep/js/webauthnauthenticate.js"></script>
+
+<div id="content-container" class="container">
+    <div class="user-section login-section">
+        <div class="logon-tab clearfix"></div>
+        <div class="login-main">
+            <h1>
+                <span>安全密钥</span>
+                {if $other}
+                <button class='btn btn-info pull-right'><a class="btn btn-info pull-right" href="{:url('twostep/logintotp')}" role="button">切换为 动态口令</a></button>
+                {/if}
+            </h1>
+            <form name="form" id="form" class="form-vertical" method="POST" action="{:url('twostep/logincheck')}">
+                {:token()}
+                <div class="form-group">
+                    <label class="control-label" for="twostep_code"></label>
+                    <div class="alert alert-info-light">
+                        硬件连接中 硬件灯光开始闪烁以后 30秒内按下按键即可</a>
+
+                    </div>
+                    <p><img class="profile-img-card" src="__CDN__/assets/addons/twostep/images/u2floading.gif" width="350px"></p>
+
+                    <p>按下安全密钥设备上的按钮，进行登录...</p>
+
+                    <div class="controls">
+                        <input type="hidden" name="type" value="webauthn"/>
+                        <input type="hidden" name="authenticate" id="authenticate"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var j = {$j};
+    setTimeout(function () {
+        webauthnAuthenticate(j.challenge, function (success, info) {
+            if (success) {
+                var form = document.getElementById('form');
+                var auth = document.getElementById('authenticate');
+                auth.value = JSON.stringify(info);
+                form.submit();
+            } else {
+                if (info.includes("InvalidStateError: An attempt was made to use an object that is not, or is no longer, usable")) {
+                    alert("您使用的安全密钥尚未在此网站注册");
+                } else {
+                    alert("连接安全密钥错误: " + info);
+                }
+                return;
+            }
+        });
+    }, 1000);
+</script>

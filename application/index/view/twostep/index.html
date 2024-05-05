@@ -1,0 +1,86 @@
+<style>
+    .panel-recharge h3 {
+        margin-bottom: 15px;
+        margin-top: 10px;
+        color: #444;
+        font-size: 16px;
+    }
+
+    .panel-recharge .custommoney {
+        border: none;
+        height: 100%;
+        width: 100%;
+        display: inherit;
+        line-height: 100%;
+    }
+
+    .list-group a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .alert-info-light a {
+        color: #fff;
+        text-decoration: none;
+    }
+</style>
+<div id="content-container" class="container">
+    <div class="row">
+        {if $twostep_config.center == 1}
+        <div class="col-md-3">
+            {include file="common/sidenav" /}
+        </div>
+        {/if}
+        <div class="col-md-{if $twostep_config.center == 1}9{else if $twostep_config.center == 0}12{/if}">
+            <div class="panel panel-default panel-recharge">
+                <div class="panel-body">
+                    <h2 class="page-header">{:__('TwoStep')}<span></span></h2>
+                    <div class="alert alert-info-light">登录策略:硬件设备优先 安全密钥 > 动态口令</div>
+                    {if $https == 0}
+                    <div class="alert alert-danger-light">网站必须开启 HTTPS 才能支持 硬件安全密钥,请配置网站 SSL 数字证书以后再刷新页面.</div>
+                    {/if}
+                    {if $twostep_config.index == 0}
+                    <div class="alert alert-danger-light">两步验证未开启,请联系管理员.</div>
+                    {else}
+                    <div class="alert alert-info-light">
+                        {if $check && $check.secret}
+                        <img src="__CDN__/assets/addons/twostep/images/totpok.png" height="36px">
+                        <b> 动态口令</b>
+                        <a class="btn btn-danger pull-right" href="{:url('index/twostep/cancel')}?type=totp" role="button"><i class="fa fa-trash-o fa-lg"></i> {:__('Cancel TOTP')}</a>
+                        {else}
+                        <img src="__CDN__/assets/addons/twostep/images/totp.png" height="36px">
+                        <b> 动态口令</b>
+                        <a class="btn btn-success pull-right" href="{:url('index/twostep/totp')}" role="button"><i class="fa fa-plus-square fa-lg"></i> 设置动态口令</a>
+                        {/if}
+                    </div>
+                    {if $https}
+                    <div class="alert alert-info-light">
+                        {if $check && $check.webauthndata}
+                        <img src="__CDN__/assets/addons/twostep/images/fidook.png" height="36px">
+                        <b> 安全密钥</b>
+                        <a class="btn btn-success pull-right" href="{:url('index/twostep/webauthn')}" role="button"><i class="fa fa-plus-square fa-lg"></i> 添加安全密钥</a>
+                        {if $keys}
+                        <br/>
+                        <br/>
+                        <div class="list-group">
+                            {volist name='keys' id='item'}
+                            <button type="button" class="list-group-item"><img src="__CDN__/assets/addons/twostep/images/fidolist.png" height="36px">&nbsp;&nbsp;&nbsp;&nbsp;
+                                {$item.name}
+                                <span class="text-center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;添加时间:{$item.time|date="Y-m-d H:i:s",###}</span>
+                                <a class="btn btn-danger pull-right" href="{:url('index/twostep/remove')}?keyid={$item.keyid}" role="button"><i class="fa fa-trash-o fa-lg"></i> 移除密钥</a>
+                            </button>
+                            {/volist}
+                        </div>
+                        {/if}
+                        {else}
+                        <img src="__CDN__/assets/addons/twostep/images/fido.png" height="36px">
+                        <b> 安全密钥</b>
+                        <a class="btn btn-success pull-right" href="{:url('index/twostep/webauthn')}" role="button"><i class="fa fa-plus-square fa-lg"></i> 添加安全密钥</a>
+                        {/if}
+                    </div>
+                    {/if}
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>

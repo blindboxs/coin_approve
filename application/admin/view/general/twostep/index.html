@@ -1,0 +1,151 @@
+<style>
+    .panel-recharge h3 {
+        margin-bottom: 15px;
+        margin-top: 10px;
+        color: #444;
+        font-size: 16px;
+    }
+
+    .panel-recharge .custommoney {
+        border: none;
+        height: 100%;
+        width: 100%;
+        display: inherit;
+        line-height: 100%;
+    }
+
+    .profile-avatar-container {
+        position: relative;
+        width: 100px;
+        margin: 0 auto;
+    }
+
+    .profile-avatar-container .profile-user-img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-avatar-container .profile-avatar-text {
+        display: none;
+    }
+
+    .profile-avatar-container:hover .profile-avatar-text {
+        display: block;
+        position: absolute;
+        height: 100px;
+        width: 100px;
+        background: #444;
+        opacity: .6;
+        color: #fff;
+        top: 0;
+        left: 0;
+        line-height: 100px;
+        text-align: center;
+    }
+
+    .profile-avatar-container button {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100px;
+        height: 100px;
+        opacity: 0;
+    }
+
+    .list-group a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .alert-info-light a {
+        color: #fff;
+        text-decoration: none;
+    }
+</style>
+<div class="row animated fadeInRight">
+    <div class="col-md-4">
+        <div class="box box-success">
+            <div class="panel-heading">
+                {:__('Profile')}
+            </div>
+            <div class="panel-body">
+                <div class="box-body box-profile">
+                    <div class="profile-avatar-container">
+                        <img class="profile-user-img img-responsive img-circle plupload" src="{$admin.avatar|cdnurl|htmlentities}" alt="">
+                        <div class="profile-avatar-text img-circle">{:__('Click to edit')}</div>
+                        <button id="plupload-avatar" class="plupload" data-input-id="c-avatar"><i class="fa fa-upload"></i> {:__('Upload')}</button>
+                    </div>
+                    <h3 class="profile-username text-center">{$admin.username|htmlentities}</h3>
+                    <p class="text-muted text-center">{$admin.email|htmlentities}</p>
+                    <div class="form-group">
+                        <label for="username" class="control-label">{:__('Username')}:</label>
+                        <input type="text" class="form-control" value="{$admin.username|htmlentities}" disabled/>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="control-label">{:__('Email')}:</label>
+                        <input type="text" class="form-control" value="{$admin.email|htmlentities}" disabled/>
+                    </div>
+                    <div class="form-group">
+                        <label for="nickname" class="control-label">{:__('Nickname')}:</label>
+                        <input type="text" class="form-control" value="{$admin.nickname|htmlentities}" disabled/>
+                    </div>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="panel panel-default panel-recharge">
+            <div class="panel-body">
+                <h2 class="page-header">{:__('TwoStep')}<span></span></h2>
+                <div class="alert alert-info-light">登录策略:硬件设备优先 安全密钥 > 动态口令</div>
+                {if $https == 0}
+                <div class="alert alert-danger-light">网站必须开启 HTTPS 才能支持 硬件安全密钥,请配置网站 SSL 数字证书以后再刷新页面.</div>
+                {/if}
+                {if $twostep_config.admin == 0}
+                <div class="alert alert-danger-light">两步验证未开启,请联系管理员.</div>
+                {else}
+                <div class="alert alert-info-light">
+                    {if $check && $check.secret}
+                    <img src="__CDN__/assets/addons/twostep/images/totpok.png" height="36px">
+                    <b> 动态口令</b>
+                    <a class="btn btn-danger pull-right" href="{:url('general/twostep/cancel')}?type=totp" role="button"><i class="fa fa-trash-o fa-lg"></i> {:__('Cancel TOTP')}</a>
+                    {else}
+                    <img src="__CDN__/assets/addons/twostep/images/totp.png" height="36px">
+                    <b> 动态口令</b>
+                    <a class="btn btn-success pull-right" href="{:url('general/twostep/totp')}" role="button"><i class="fa fa-plus-square fa-lg"></i> 设置动态口令</a>
+                    {/if}
+                </div>
+                {if $https}
+                <div class="alert alert-info-light">
+                    {if $check && $check.webauthndata}
+                    <img src="__CDN__/assets/addons/twostep/images/fidook.png" height="36px">
+                    <b> 安全密钥</b>
+                    <a class="btn btn-success pull-right" href="{:url('general/twostep/webauthn')}" role="button"><i class="fa fa-plus-square fa-lg"></i> 添加安全密钥</a>
+                    {if $keys}
+                    <br/>
+                    <br/>
+                    <div class="list-group">
+                        {volist name='keys' id='item'}
+                        <button type="button" class="list-group-item"><img src="__CDN__/assets/addons/twostep/images/fidolist.png" height="36px">&nbsp;&nbsp;&nbsp;&nbsp;
+                            {$item.name}
+                            <span class="text-center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;添加时间:{$item.time|date="Y-m-d H:i:s",###}</span>
+                            <a class="btn btn-danger pull-right" href="{:url('general/twostep/remove')}?keyid={$item.keyid}" role="button"><i class="fa fa-trash-o fa-lg"></i> 移除密钥</a>
+                        </button>
+                        {/volist}
+                    </div>
+                    {/if}
+                    {else}
+                    <img src="__CDN__/assets/addons/twostep/images/fido.png" height="36px">
+                    <b> 安全密钥</b>
+                    <a class="btn btn-success pull-right" href="{:url('general/twostep/webauthn')}" role="button"><i class="fa fa-plus-square fa-lg"></i> 添加安全密钥</a>
+                    {/if}
+                </div>
+                {/if}
+                {/if}
+            </div>
+        </div>
+    </div>
+
+</div>
+

@@ -1,0 +1,168 @@
+<style>
+    .panel-recharge h3 {
+        margin-bottom: 15px;
+        margin-top: 10px;
+        color: #444;
+        font-size: 16px;
+    }
+
+    .row-recharge > div {
+        margin-bottom: 10px;
+    }
+
+    .row-recharge > div > label {
+        width: 100%;
+        height: 40px;
+        display: block;
+        font-size: 14px;
+        line-height: 40px;
+        color: #999;
+        background: #fff;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+        cursor: pointer;
+        text-align: center;
+        border: 1px solid #ddd;
+        margin-bottom: 20px;
+        font-weight: 400;
+    }
+
+    .row-recharge > div > label.active {
+        border-color: #0d95e8;
+        color: #0d95e8;
+    }
+
+    .row-recharge > div > label:hover {
+        z-index: 4;
+        border-color: #27b0d6;
+        color: #27b0d6;
+    }
+
+    .panel-recharge .custommoney {
+        border: none;
+        height: 100%;
+        width: 100%;
+        display: inherit;
+        line-height: 100%;
+    }
+
+    .row-recharge > div {
+        height: 40px;
+        line-height: 40px;
+    }
+
+    .row-recharge > div input.form-control {
+        border: none;
+    }
+
+    .row-paytype div input {
+        display: none;
+    }
+
+    .row-paytype img {
+        height: 22px;
+        margin: 8px;
+        vertical-align: inherit;
+    }
+
+    .btn-recharge {
+        height: 40px;
+        line-height: 40px;
+        font-size: 14px;
+        padding: 0;
+    }
+</style>
+<script src="__CDN__/assets/addons/twostep/js/webauthnregister.js"></script>
+<div id="content-container" class="container">
+    <div class="row">
+        {if $twostep_config.center == 1}
+        <div class="col-md-3">
+            {include file="common/sidenav" /}
+        </div>
+        {/if}
+        <div class="col-md-{if $twostep_config.center == 1}9{else if $twostep_config.center == 0}12{/if}">
+            <div class="panel panel-default panel-recharge">
+                <div class="panel-body">
+                    <h2 class="page-header">{:__('TwoStep')}<span>-{:__('WebAuthn')}</span></h2>
+                    <div class="alert alert-info-light">
+                        硬件连接中 硬件灯光开始闪烁以后 30秒内按下按键即可</a>
+                    </div>
+                    <p><img class="profile-img-card" src="__CDN__/assets/addons/twostep/images/u2floading.gif" width="350px"></p>
+                    <p>请输入密钥别名,未填写将随机生成,然后点击注册密钥按钮...</p>
+                    <p>然后按下安全密钥设备上的按钮，注册安全密钥到系统...</p>
+
+                    <form action="{:url('twostep/webauthnreg')}" method="POST" id="form" class="form-inline" role="form">
+                        {:token()}
+                        <div class="form-group">
+                            <label for="keyname">密钥别名</label>
+                            <input name="keyname" type="text" class="form-control" id="keyname" placeholder="密钥别名,未填写随机">
+                        </div>
+                        <a class="btn btn-success" id="reg">注册密钥</a>
+                        <input type="hidden" name="username" id="username" value="{$username}"/><br/>
+                        <input type="hidden" name="register" id="register"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__CDN__/assets/addons/twostep/js/jquery.min.js"></script>
+<script language="javascript" type="text/javascript">
+    //禁用Enter键表单自动提交
+    document.onkeydown = function (event) {
+        var target, code, tag;
+        if (!event) {
+            event = window.event; //针对ie浏览器
+            target = event.srcElement;
+            code = event.keyCode;
+            if (code == 13) {
+                tag = target.tagName;
+                if (tag == "TEXTAREA") {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } else {
+            target = event.target; //针对遵循w3c标准的浏览器，如Firefox
+            code = event.keyCode;
+            if (code == 13) {
+                tag = target.tagName;
+                if (tag == "INPUT") {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+    };
+</script>
+<script>
+    var j = {$j};
+    $('#reg').on('click', function (e) {
+        setTimeout(function () {
+            webauthnRegister(j.challenge, function (success, info) {
+                if (success) {
+                    var form = document.getElementById('form');
+                    var reg = document.getElementById('register');
+                    var user = document.getElementById('username');
+                    var __token__ = document.getElementById('__token__');
+                    reg.value = JSON.stringify(info);
+                    user.value = username;
+                    form.submit();
+                } else {
+                    if (info.includes("InvalidStateError: An attempt was made to use an object that is not, or is no longer, usable")) {
+                        alert("您已注册过此安全密钥,无需再次注册,请使用其他安全密钥注册");
+                    } else if (info.includes("InvalidStateError: An attempt was made to use an object that is not, or is no longer, usable")) {
+                        alert("您使用的安全密钥尚未在此网站注册");
+                    } else {
+                        alert("安全密钥注册认证错误: " + info);
+                    }
+                    return;
+                }
+            });
+
+        }, 1000);
+    })
+</script>

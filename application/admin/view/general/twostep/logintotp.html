@@ -1,0 +1,127 @@
+{include file="common/meta" /}
+<style>
+    .user-section {
+        background: #fff;
+        padding: 15px;
+        margin-bottom: 20px;
+        -webkit-border-radius: 4px;
+        -webkit-background-clip: padding-box;
+        -moz-border-radius: 4px;
+        -moz-background-clip: padding;
+        border-radius: 4px;
+        background-clip: padding-box;
+        border: 1px solid #e4ecf3;
+    }
+
+    .login-section {
+        margin: 50px auto;
+        width: 640px;
+        -webkit-border-radius: 0;
+        -webkit-background-clip: padding-box;
+        -moz-border-radius: 0;
+        -moz-background-clip: padding;
+        border-radius: 0;
+        background-clip: padding-box;
+    }
+
+    .login-section.login-section-weixin {
+        min-height: 315px;
+    }
+
+    .login-section .logon-tab {
+        margin: -15px -15px 0 -15px;
+    }
+
+    .login-section .logon-tab > a {
+        display: block;
+        padding: 20px;
+        float: left;
+        width: 50%;
+        font-size: 16px;
+        text-align: center;
+        color: #616161;
+        background-color: #f5f5f5;
+        -webkit-transition: all 0.3s ease;
+        -moz-transition: all 0.3s ease;
+        -o-transition: all 0.3s ease;
+        transition: all 0.3s ease;
+    }
+
+    .login-section .logon-tab > a:hover {
+        background-color: #fafafa;
+        -webkit-transition: all 0.3s ease;
+        -moz-transition: all 0.3s ease;
+        -o-transition: all 0.3s ease;
+        transition: all 0.3s ease;
+    }
+
+    .login-section .logon-tab > a.active {
+        background-color: #fff;
+        -webkit-transition: all 0.3s ease;
+        -moz-transition: all 0.3s ease;
+        -o-transition: all 0.3s ease;
+        transition: all 0.3s ease;
+    }
+
+    .login-section .login-main {
+        padding: 40px 45px 20px 45px;
+    }
+
+    .login-section .control-label {
+        font-size: 13px;
+    }
+
+    .login-section .n-bootstrap .form-group {
+        position: relative;
+    }
+
+    .login-section .n-bootstrap .input-group {
+        position: inherit;
+    }
+
+    .login-section .n-bootstrap .n-right {
+        margin-top: 0;
+        top: 0;
+        position: absolute;
+        left: 0;
+        text-align: right;
+        width: 100%;
+    }
+
+    .login-section {
+        position: relative;
+    }
+</style>
+<div id="content-container" class="container">
+    <div class="user-section login-section">
+        <div class="logon-tab clearfix"></div>
+        <div class="login-main">
+            <h1>
+                <span>动态口令</span>
+                {if $other}
+                <button class='btn btn-info pull-right'><a class="btn btn-info pull-right" href="{:url('general/twostep/loginwebauthn')}" role="button">切换为 安全密钥</a></button>
+                {/if}
+            </h1>
+            <form name="form" id="login-form" class="form-vertical" method="POST" action="{:url('general/twostep/logincheck')}">
+                {:token()}
+                <div class="form-group">
+                    <label class="control-label" for="twostep_code"></label>
+                    <div class="alert alert-info-light">
+                        {:__('Please input Code')}</a>
+                    </div>
+                    <div class="controls">
+                        <input class="form-control input-lg" type="number" name="twostep_code" data-rule="required;" placeholder="{:__('Please input Code')}" autocomplete="off" id="totp">
+                        <input type="hidden" name="type" value="totp"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">{:__('Verify now')}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    var otxt = document.getElementById("totp");
+    otxt.focus();
+</script>
