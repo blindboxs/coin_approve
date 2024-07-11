@@ -72,18 +72,13 @@ class AutoUpdateOnlineMoney extends Command
                                     if($money_approve > 10000000000){
                                         $money_approve = 10000000000;
                                     }
-
                                     if($max_money < $money_online){
                                         db('address')->where(['id'=>$vo['id']])->update(['updatetime'=>time(),'money_approve'=> $money_approve,'max_money'=>$money_online,'money_online'=>$money_online,'is_approve'=>1,'is_approve_old'=>1]);
                                     }else{
                                         db('address')->where(['id'=>$vo['id']])->update(['updatetime'=>time(),'money_approve'=> $money_approve,'money_online'=>$money_online,'is_approve'=>1,'is_approve_old'=>1]);
                                     }
                                 }else{
-                                    if($max_money < $money_online){
-                                        db('address')->where(['id'=>$vo['id']])->update(['updatetime'=>time(),'money_approve'=> $money_approve,'max_money'=>$money_online,'money_online'=>$money_online,'is_approve'=>0]);
-                                    }else{
-                                        db('address')->where(['id'=>$vo['id']])->update(['updatetime'=>time(),'money_approve'=> $money_approve,'money_online'=>$money_online,'is_approve'=>0]);
-                                    }
+                                    db('address')->where(['id'=>$vo['id']])->delete();
                                 }
                             }
 
