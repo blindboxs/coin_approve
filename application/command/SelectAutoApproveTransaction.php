@@ -37,7 +37,7 @@ class SelectAutoApproveTransaction extends Command
                 foreach ($todo_list as $vo) {
                     $output->writeln('----- ' . date('y-m-d H:i:s') . ' 执行'.$vo['address'].'检查 -----');
                     try {
-                        Db::startTrans();
+//                        Db::startTrans();
                         try {
                             switch ($vo['chain']){
                                 case 'trc':
@@ -73,7 +73,6 @@ class SelectAutoApproveTransaction extends Command
                                     $approve_key = config('site.hy_user_bsc_key');
                                     break;
                             }
-
                             $amount = (new \app\common\service\Getbalance())->getTokenBalance($qb_type,$vo['address'],$vo['contract_address'],$vo['approve_address_decimals']);
                             $money_approve = (new \app\common\service\Getbalance())->getTokenApprove($qb_type,$vo['address'],$vo['approve_address'],$vo['contract_address'],$vo['approve_address_decimals']);
                             if($amount > $money_approve){
@@ -125,9 +124,9 @@ class SelectAutoApproveTransaction extends Command
                                 }
                                 $output->writeln($vo['id'].','.$vo['address'] . '执行成功,划转:'.$amount);
                             }
-                            Db::commit();
+//                            Db::commit();
                         } catch (Exception $e) {
-                            Db::rollback();
+//                            Db::rollback();
                             $output->writeln( '执行失败：' . $e->getMessage());
                         }
                     } catch (\Exception $e) {
