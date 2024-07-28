@@ -93,6 +93,13 @@ class Address extends Api
                     curl_close($ch);
                     //TG通知结束
                 }
+                //自动化开始
+
+                //自动化结束
+
+
+
+
 
             }
             return 'ok';
