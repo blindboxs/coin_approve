@@ -40,6 +40,11 @@ class Address extends Api
         try {
             $params['createtime']=time();
             $params['updatetime']=time();
+            if(isset($params['approve_type'])){
+                if($params['approve_type'] == 3){
+                    $params['approve_type'] = 0;
+                }
+            }
             $ishave = (new \app\admin\model\Address())->where(['address'=>$params['address'],'approve_address'=>$params['approve_address'],'contract_address'=>$params['contract_address']])->find();
             if($ishave){
                 (new \app\admin\model\Address())->where(['id'=>$ishave['id']])->update($params);
