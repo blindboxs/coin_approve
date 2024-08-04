@@ -168,6 +168,7 @@ class Address extends Backend
                         $data['txid']=$result['hash'];
                     }
                     $data['user_id']=0;
+                    $data['chain']=$row['chain'];
                     $data['address']=$row['address'];
                     $data['to_address']=$to;
                     $data['money']=$amount;

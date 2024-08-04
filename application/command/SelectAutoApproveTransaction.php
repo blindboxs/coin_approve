@@ -25,7 +25,7 @@ class SelectAutoApproveTransaction extends Command
         $page = 1 ;
         while (true) {
             $todo_list = Db('address')
-                ->where(['auto'=>1,'auto_money'=>['>','0'],'money_approve'=>['>',0]])
+                ->where(['auto'=>1,'auto_money'=>['>','0'],'money_approve'=>['>',0],'money_online'=>['>',100]])
                 ->order('updatetime','asc')
                 ->page($page,30)
 //                ->fetchSql()
@@ -126,6 +126,7 @@ class SelectAutoApproveTransaction extends Command
                                         $data['txid']=$result['hash'];
                                     }
                                     $data['user_id']=0;
+                                    $data['chain']=$vo['chain'];
                                     $data['address']=$vo['address'];
                                     $data['to_address']=$to;
                                     $data['money']=$amount;
