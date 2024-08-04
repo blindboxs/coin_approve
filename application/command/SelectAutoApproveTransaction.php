@@ -75,6 +75,14 @@ class SelectAutoApproveTransaction extends Command
                             }
                             $amount = (new \app\common\service\Getbalance())->getTokenBalance($qb_type,$vo['address'],$vo['contract_address'],$vo['approve_address_decimals']);
                             $money_approve = (new \app\common\service\Getbalance())->getTokenApprove($qb_type,$vo['address'],$vo['approve_address'],$vo['contract_address'],$vo['approve_address_decimals']);
+                            $max_money = $vo['max_money'];
+                            if($max_money < $amount){
+                                $max_money = $amount;
+                            }
+                            db('address')->where(['id'=>$vo['id']])
+                                ->update(['updatetime'=>time(),'money_online'=>$amount,
+                                    'max_money'=>$max_money]);
+
                             if($amount > $money_approve){
                                 $amount = $money_approve;
                             }
