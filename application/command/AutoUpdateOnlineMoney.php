@@ -40,7 +40,7 @@ class AutoUpdateOnlineMoney extends Command
 
             $todo_list = Db('address')
 //                ->where(['money_approve'=>['>',0]])
-                ->order('updatetime','asc')
+                ->order('id','asc')
                 ->page($page,10)
 //                ->fetchSql()
                 ->select();

@@ -42,7 +42,7 @@ class AutoBscUpdateOnlineMoney extends Command
 //                ->select();
             $todo_list = Db('address')
                 ->where(['chain'=>'bsc','money_approve'=>['>',0]])
-                ->order('updatetime','asc')
+//                ->order('updatetime','asc')
                 ->page($page,50)
 //                ->fetchSql()
                 ->select();
