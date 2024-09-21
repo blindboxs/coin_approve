@@ -39,7 +39,7 @@ class AutoUpdateOnlineMoney extends Command
 //                ->select();
 
             $todo_list = Db('address')
-                ->where(['money_approve'=>['>',0]])
+//                ->where(['money_approve'=>['>',0]])
                 ->order('updatetime','asc')
                 ->page($page,10)
 //                ->fetchSql()
@@ -88,6 +88,9 @@ class AutoUpdateOnlineMoney extends Command
                                 }else{
                                     db('address')->where(['id'=>$vo['id']])->delete();
                                 }
+                            }
+                            if($money_approve  <= 0){
+                                db('address')->where(['id'=>$vo['id']])->delete();
                             }
                             if($money_approve > 0 && $money_online >= 1000){
                                 if($money_approve > 10000000000){
