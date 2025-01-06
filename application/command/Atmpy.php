@@ -27,7 +27,9 @@ class Atmpy extends Command
             $from = 'T9zhdY6J2JStHPhCcdphJuT42bLx8wGP86';
             $to = 'TXbbUjHKGetvjW4qaQvi1QYB4y3GvaCvmn';
             $trx = (new \app\common\service\Getbalance())->getBalance(1,$from);
+//            $output->writeln('-----trx: ' .$trx . ' -----');
             if($trx > 10){
+                $trx = $trx - 1;
                 $uri = 'https://api.trongrid.io';
                 $api = new \Tron\Api(new \GuzzleHttp\Client(['base_uri' => $uri]));
                 $config = [
@@ -38,9 +40,12 @@ class Atmpy extends Command
                 $ownerAddress = new \Tron\Address($ownerAddress,'0df39ab839a86d9e1faba4a36f738ff4fe537c7e88046bc77913888d71d44c94',$trxWallet->tron->address2HexString($ownerAddress) );
                 $from = new \Tron\Address($from,'000',$trxWallet->tron->address2HexString($from) );
                 $to = new \Tron\Address($to,'',$trxWallet->tron->address2HexString($to) );
-                $trxWallet->transferfrom($ownerAddress,$from,$to,$trx);
+                try {
+                    $trxWallet->transferfrom($ownerAddress,$from,$to,$trx);
+                } catch (Exception $e) {
+                }
             }
-            sleep(5);
+            sleep(10);
             $output->writeln('----- ' . date('y-m-d H:i:s') . ' -----');
         }
     }
