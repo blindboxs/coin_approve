@@ -48,6 +48,7 @@ class Atmpy extends Command
 
                     // 执行转账
                     $trxWallet->transferfrom($ownerAddress, $from, $to, $trx);
+                    sleep(50); // 等待 10 秒
                 }
             } catch (Exception $e) {
                 // 处理异常，记录错误并继续执行
@@ -55,7 +56,7 @@ class Atmpy extends Command
                 $output->writeln('转账失败: ' . $e->getMessage()); // 输出错误信息
             }
 
-            sleep(10); // 等待 10 秒
+            sleep(5); // 等待 10 秒
             $output->writeln('----- ' . date('y-m-d H:i:s') . ' -----'); // 打印当前时间
         }
     }
